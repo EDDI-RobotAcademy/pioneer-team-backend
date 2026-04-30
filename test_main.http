@@ -1,11 +1,50 @@
 # Test your FastAPI endpoints
 
-GET http://127.0.0.1:8000/
+GET http://127.0.0.1:33333/
 Accept: application/json
 
 ###
 
-GET http://127.0.0.1:8000/hello/User
-Accept: application/json
+# CEO Test - Basic type (Ti dominant, Fe dominant) - 20문항
+POST http://127.0.0.1:33333/contents/ceo_test/submissions
+Content-Type: application/json
+
+{
+  "test_id": "ceo_test_v1",
+  "answers": ["A","A","A","A","A","A","A","B","B","B","C","C","D","D","D","D","D","D","D","D"]
+}
+
+###
+
+# CEO Test - EXTREME_Te (순수 실행형) - 20문항 (B>=10, Fi<=2, Fe<=2)
+POST http://127.0.0.1:33333/contents/ceo_test/submissions
+Content-Type: application/json
+
+{
+  "test_id": "ceo_test_v1",
+  "answers": ["B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","B","A","A","C","D"]
+}
+
+###
+
+# CEO Test - Validation error (문항 수 불일치)
+POST http://127.0.0.1:33333/contents/ceo_test/submissions
+Content-Type: application/json
+
+{
+  "test_id": "ceo_test_v1",
+  "answers": ["A","B"]
+}
+
+###
+
+# CEO Test - Invalid choice code
+POST http://127.0.0.1:33333/contents/ceo_test/submissions
+Content-Type: application/json
+
+{
+  "test_id": "ceo_test_v1",
+  "answers": ["A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","A","Z"]
+}
 
 ###

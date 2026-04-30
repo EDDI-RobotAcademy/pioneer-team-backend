@@ -1,6 +1,8 @@
 from functools import lru_cache
+from typing import Annotated
 
-from pydantic_settings import BaseSettings
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, NoDecode
 
 
 class Settings(BaseSettings):
@@ -10,6 +12,30 @@ class Settings(BaseSettings):
     mysql_port: int
     mysql_database: str
     debug: bool = False
+
+    cors_allow_origins: Annotated[list[str], NoDecode] = []
+    cors_allow_methods: Annotated[list[str], NoDecode] = [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS",
+    ]
+    cors_allow_headers: Annotated[list[str], NoDecode] = ["*"]
+    cors_allow_credentials: bool = False
+
+    @field_validator(
+        "cors_allow_origins",
+        "cors_allow_methods",
+        "cors_allow_headers",
+        mode="before",
+    )
+    @classmethod
+    def split_comma_separated(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [item.strip() for item in value.split(",") if item.strip()]
+        return value
 
     model_config = {
         "env_file": ".env",

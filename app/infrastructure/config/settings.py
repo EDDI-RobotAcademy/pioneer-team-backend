@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     cors_allow_headers: Annotated[list[str], NoDecode] = ["*"]
     cors_allow_credentials: bool = False
 
+    dashboard_password: str | None = None
+
     @property
     def database_url(self) -> str:
         user = quote_plus(self.mysql_user)

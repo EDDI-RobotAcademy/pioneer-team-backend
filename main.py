@@ -6,24 +6,30 @@ from app.domains.ceo_test.adapter.inbound.api.ceo_test_router import (
 from app.domains.tracking.ingestion.adapter.inbound.api.tracking_event_router import (
     create_tracking_event_router,
 )
-from app.domains.tracking.ingestion.adapter.outbound.persistence.in_memory_event_repository import (
-    InMemoryEventRepository,
-)
-from app.domains.tracking.ingestion.application.usecase.ingest_event_usecase import (
-    IngestEventUseCase,
+from app.domains.tracking.ingestion.infrastructure.orm.tracking_event_orm import (  # noqa: F401  (table registration)
+    TrackingEventORM,
 )
 from app.infrastructure.config.settings import Settings, get_settings
+from app.infrastructure.database.base import Base
+from app.infrastructure.database.engine import (
+    create_database_engine,
+    create_session_factory,
+)
+from app.infrastructure.database.session import make_session_dependency
 from app.infrastructure.middleware.cors import register_cors_middleware
 
 settings: Settings = get_settings()
 
-event_repository = InMemoryEventRepository()
-ingest_event_usecase = IngestEventUseCase(event_repository)
+engine = create_database_engine(settings)
+session_factory = create_session_factory(engine)
+get_db_session = make_session_dependency(session_factory)
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(debug=settings.debug)
 register_cors_middleware(app, settings)
 app.include_router(ceo_test_router)
-app.include_router(create_tracking_event_router(ingest_event_usecase))
+app.include_router(create_tracking_event_router(get_db_session))
 
 
 @app.get("/")

@@ -1,5 +1,6 @@
 from functools import lru_cache
 from typing import Annotated
+from urllib.parse import quote_plus
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, NoDecode
@@ -24,6 +25,15 @@ class Settings(BaseSettings):
     ]
     cors_allow_headers: Annotated[list[str], NoDecode] = ["*"]
     cors_allow_credentials: bool = False
+
+    @property
+    def database_url(self) -> str:
+        user = quote_plus(self.mysql_user)
+        password = quote_plus(self.mysql_password)
+        return (
+            f"mysql+pymysql://{user}:{password}"
+            f"@{self.mysql_host}:{self.mysql_port}/{self.mysql_database}"
+        )
 
     @field_validator(
         "cors_allow_origins",

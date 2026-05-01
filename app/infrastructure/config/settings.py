@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     cors_allow_credentials: bool = False
 
     dashboard_password: str | None = None
+    dashboard_token_secret: str | None = None
+    dashboard_token_ttl_seconds: int = 86400
+    dashboard_cookie_name: str = "dashboard_gate"
+    dashboard_cookie_secure: bool = False
 
     @property
     def database_url(self) -> str:
